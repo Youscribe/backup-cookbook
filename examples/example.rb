@@ -18,13 +18,8 @@
 # limitations under the License.
 #
 
-backup_install node.name 
-backup_generate_config node.name
-package "libxml2-dev"
-package "libxslt1-dev"
-gem_package "fog" do
-  version "~> 1.4.0"
-end
+include_recipe "backup"
+
 backup_generate_model "pg" do
   description "backup of postgres"
   backup_type "database"

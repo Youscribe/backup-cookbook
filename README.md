@@ -13,20 +13,6 @@ Resources and Providers
 
 This cookbook provides three resources and corresponding providers.
 
-`install.rb`
--------------
-
-Install or Remove the backup gem with this resource.
-
-Actions:
-
-* `install` - installs the backup gem
-* `remove` - removes the backup gem
-
-Attribute Parameters:
-
-* `version` - specify the version of the backup gem to install
-
 `generate_config.rb`
 -------------
 
@@ -78,13 +64,10 @@ There is an ininite ways you can implement this cookbook into your environment i
   1. Ensure your mongodb cookbook depends on the backup cookbook
   2. Add the following to your mongodb cookbook
 
-        backup_install node.name  
-        backup_generate_config node.name  
-        package "libxml2-dev"  
-        package "libxslt1-dev"  
-        gem_package "fog" do  
-          version "~> 1.4.0"  
-        end  
+        include_recipe "backup"
+
+        backup_generate_config node.name
+
         backup_generate_model "mongodb" do  
           description "Our shard"  
           backup_type "database"  
@@ -100,14 +83,11 @@ There is an ininite ways you can implement this cookbook into your environment i
 * Backing up PostgreSQL to S3
   1. Ensure your postgresql cookbook depends on the backup cookbook
   2. Add the following to your postgresql cookbook
+
+        include_recipe "backup"
   
-        backup_install node.name  
         backup_generate_config node.name  
-        package "libxml2-dev"  
-        package "libxslt1-dev"  
-        gem_package "fog" do  
-          version "~> 1.4.0"  
-        end  
+
         backup_generate_model "pg" do  
           description "backup of postgres"  
           backup_type "database"  
@@ -122,14 +102,11 @@ There is an ininite ways you can implement this cookbook into your environment i
 * Backing up Files to S3
   1. Ensure the cookbook are updating depends on the backup cookbook.
   2. Add the following to that cookbook
+
+        include_recipe "backup"
   
-        backup_install node.name   
-        backup_generate_config node.name  
-        package "libxml2-dev"  
-        package "libxslt1-dev"  
-        gem_package "fog" do  
-          version "~> 1.4.0"  
-        end  
+        backup_generate_config node.name
+
         backup_generate_model "home" do  
           description "backup of /home"  
           backup_type "archive"  
