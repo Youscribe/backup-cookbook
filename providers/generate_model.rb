@@ -5,7 +5,8 @@ action :backup do
     day new_resource.day || "*"
     month new_resource.month || "*"
     weekday new_resource.weekday || "*"
-    mailto new_resource.mailto 
+    user new_resource.user if new_resource.user
+    mailto new_resource.mailto
     command "backup perform -t #{new_resource.name} -c #{new_resource.base_dir}/config.rb"
     path new_resource.base_dir
     action :nothing

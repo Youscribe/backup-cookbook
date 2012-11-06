@@ -12,6 +12,7 @@ attribute :minute, :kind_of => String, :default => "*"
 attribute :day, :kind_of => String, :default => "*"
 attribute :month, :kind_of => String, :default => "*"
 attribute :weekday, :kind_of => String, :default => "*"
+attribute :user, :kind_of => String
 attribute :mailto, :kind_of => String, :default => nil
 
 def initialize(*args)
