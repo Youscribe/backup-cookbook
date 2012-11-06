@@ -1,5 +1,6 @@
 action :backup do
-  cron "scheduled backup: " + new_resource.name do
+  include_recipe "cron"
+  cron_d "scheduled backup: " + new_resource.name do
     hour new_resource.hour || "1" 
     minute new_resource.minute || "*"
     day new_resource.day || "*"
@@ -24,7 +25,7 @@ action :backup do
                 :database_type => new_resource.database_type,
                 :store_with => new_resource.store_with
               })
-    notifies :create, resources(:cron => "scheduled backup: " + new_resource.name), :immediately
+    notifies :create, resources(:cron_d => "scheduled backup: " + new_resource.name), :immediately
   end
   new_resource.updated_by_last_action(true)
 end
