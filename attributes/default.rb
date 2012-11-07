@@ -1,0 +1,5 @@
+default['backup']['conf_dir'] = "/etc/backup"
+default['backup']['tmp_dir'] = "/tmp/backup"
+default['backup']['cache_dir'] = "/var/cache/backup"
+default['backup']['data_dir'] = "/var/lib/backup"
+default['backup']['log_dir'] = "/var/log/backup"

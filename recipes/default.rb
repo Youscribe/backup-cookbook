@@ -19,3 +19,47 @@
 #
 
 include_recipe "backup::install_gem"
+
+directory node['backup']['conf_dir'] do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+end
+
+%w{keys}.each do |dir|
+  directory ::File.join(node['backup']['conf_dir'], dir) do
+    owner "root"
+    group "root"
+    mode "0644"
+    action :create
+  end
+end
+
+directory node['backup']['log_dir'] do
+  owner "root"
+  group "root"
+  mode "0666"
+  action :create
+end
+
+directory node['backup']['cache_dir'] do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+end
+
+directory node['backup']['tmp_dir'] do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+end
+
+directory node['backup']['data_dir'] do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+end

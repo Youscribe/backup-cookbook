@@ -10,7 +10,7 @@ end
 
 
 ['backup', 's3sync', 'fog', 'mail', 'whenever', 'popen4'].each do |gem_name|
-  chef_gem gem_name do
+  gem_package gem_name do
     action :install
   end
 end
