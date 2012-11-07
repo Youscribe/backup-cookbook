@@ -1,7 +1,6 @@
 actions :backup, :disable, :remove
 
 attribute :options, :kind_of => Hash
-attribute :base_dir, :kind_of => String, :default => "/opt/backup"
 attribute :split_into_chunks_of, :kind_of => Fixnum, :default => 250
 attribute :description, :kind_of => String, :default => nil
 attribute :backup_type, :kind_of => String, :default => "database"
@@ -14,6 +13,7 @@ attribute :month, :kind_of => String, :default => "*"
 attribute :weekday, :kind_of => String, :default => "*"
 attribute :user, :kind_of => String
 attribute :mailto, :kind_of => String, :default => nil
+attribute :password, :kind_of => String
 
 def initialize(*args)
   super
