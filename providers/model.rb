@@ -9,6 +9,7 @@ action :create do
     user new_resource.user if new_resource.user
     mailto new_resource.mailto
     command backup_command(new_resource.name)
+    path ENV['PATH']
     action :create
   end
   new_resource.updated_by_last_action(true)
