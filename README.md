@@ -25,7 +25,6 @@ Actions:
 
 Attribute Parameters:
 
-* `base_dir` - String - default to `/opt/backup`   
 * `split_into_chunks_of` - Fixnum - defaults to 250  
 * `description` - String - Description of backup   
 * `backup_type` - String - Type of backup to perform.  Current options supported are `{database|archive}`  
