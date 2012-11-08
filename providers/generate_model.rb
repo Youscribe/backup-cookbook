@@ -1,6 +1,6 @@
 action :backup do
   include_recipe "cron"
-  cron_d "scheduled backup: " + new_resource.name do
+  cron_d new_resource.name do
     hour new_resource.hour || "1" 
     minute new_resource.minute || "*"
     day new_resource.day || "*"
@@ -9,8 +9,10 @@ action :backup do
     user new_resource.user if new_resource.user
     mailto new_resource.mailto
     command backup_command(new_resource.name)
-    action :nothing
+    action :create
   end
+  new_resource.updated_by_last_action(true)
+
   template "Model File" do
     path ::File.join( node['backup']['conf_dir'], new_resource.name + '.rb')
     mode 0600
@@ -26,13 +28,13 @@ action :backup do
       :store_with => new_resource.store_with,
       :password => new_resource.password
     )
-    notifies :create, resources(:cron_d => "scheduled backup: " + new_resource.name), :immediately
+    notifies :create, resources(:cron_d => new_resource.name), :immediately
   end
   new_resource.updated_by_last_action(true)
 end
 
 action :disable do
-  cron "scheduled backup: " + current_resource.name do
+  cron_d current_resource.name do
     action :remove
   end
   new_resource.updated_by_last_action(true)
