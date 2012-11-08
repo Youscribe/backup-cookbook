@@ -1,4 +1,4 @@
-action :backup do
+action :create do
   include_recipe "cron"
   cron_d new_resource.name do
     hour new_resource.hour || "1" 

@@ -1,4 +1,6 @@
-actions :backup, :disable, :remove
+actions :create, :disable, :remove
+
+default_action :create
 
 attribute :options, :kind_of => Hash
 attribute :split_into_chunks_of, :kind_of => Fixnum, :default => 250
@@ -15,7 +17,8 @@ attribute :user, :kind_of => String
 attribute :mailto, :kind_of => String, :default => nil
 attribute :password, :kind_of => String
 
+# Covers 0.10.8 and earlier
 def initialize(*args)
   super
-  @action = :nothing
+  @action = :create
 end
