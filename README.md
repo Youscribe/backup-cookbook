@@ -11,31 +11,14 @@ Ruby installed either in the system or via omnibus
 Resources and Providers
 =======================
 
-This cookbook provides three resources and corresponding providers.
-
-`generate_config.rb`
+`model`
 -------------
 
-Generate a configuration file for the backup gem with this resource.
-
-Actions: 
-
-* `setup` - sets up a basic config.rb for the backup gem
-* `remove` - **removes the base directory for the backup gem** and everything underneath it.
-
-Attribute Parameters:
-
-* `base_dir` - String - default to `/opt/backup`
-* `encryption_password` - String - Provide a passphrase for [Encryption](https://github.com/meskyanichi/backup/wiki/Encryptors) - default of `nil`
-
-`generate_model.rb`
--------------
-
-Generates a model file for the backup gem and creates a crontab entry.
+Generates a model file for the backup gem and creates a cron entry.
 
 Actions:
 
-* `backup` - Generate a model file 
+* `create` - Generate a model file 
 * `disable` - Disable the scheduled cron for the model
 * `remove` - Remove the model from the system and the scheduled cron.
 
@@ -52,7 +35,8 @@ Attribute Parameters:
 * `minute` - String - Minute to run the scheduled backup - default - `*`  
 * `day` - String - Day to run the scheduled backup - default - `*`  
 * `weekday` - String - Weekday to run the scheduled backup - default - `*`  
-* `mailto` - String - Enables the cron resource to mail the output of the backup output.  
+* `mailto` - String - Enables the cron resource to mail the output of the backup output.
+* `user` - String - User used to launch backup
 
 
 Usage
@@ -64,58 +48,100 @@ There is an ininite ways you can implement this cookbook into your environment i
   1. Ensure your mongodb cookbook depends on the backup cookbook
   2. Add the following to your mongodb cookbook
 
-        include_recipe "backup"
+```
+include_recipe "backup"
 
-        backup_generate_config node.name
-
-        backup_generate_model "mongodb" do  
-          description "Our shard"  
-          backup_type "database"  
-          database_type "MongoDB"  
-          split_into_chunks_of 2048  
-          store_with({"engine" => "S3", "settings" => { "s3.access_key_id" => "example", "s3.secret_access_key" => "sample", "s3.region" => "us-east-1", "s3.bucket" => "sample", "s3.path" => "/", "s3.keep" => 10 } } )  
-          options({"db.host" => "\"localhost\"", "db.lock" => true})  
-          mailto "some@example.com"  
-          action :backup  
-        end  
-      
+backup_model "mongodb" do  
+  description "Our shard"  
+  backup_type "database"  
+  database_type "MongoDB"  
+  split_into_chunks_of 2048  
+  store_with({
+    "engine" => "S3",
+    "settings" => {
+       "s3.access_key_id" => "example",
+       "s3.secret_access_key" => "sample",
+       "s3.region" => "us-east-1",
+       "s3.bucket" => "sample",
+       "s3.path" => "/",
+       "s3.keep" => 10 
+    }
+  })  
+  options({
+    "db.host" => "\"localhost\"",
+    "db.lock" => true
+  })  
+  mailto "some@example.com"  
+  action :create  
+end  
+```   
 
 * Backing up PostgreSQL to S3
   1. Ensure your postgresql cookbook depends on the backup cookbook
   2. Add the following to your postgresql cookbook
 
-        include_recipe "backup"
+```
+include_recipe "backup"
   
-        backup_generate_config node.name  
-
-        backup_generate_model "pg" do  
-          description "backup of postgres"  
-          backup_type "database"  
-          database_type "PostgreSQL"  
-          split_into_chunks_of 2048  
-          store_with({"engine" => "S3", "settings" => { "s3.access_key_id" => "sample", "s3.secret_access_key" => "sample", "s3.region" => "us-east-1", "s3.bucket" => "sample", "s3.path" => "/", "s3.keep" => 10 } } )
-  options({"db.name" => "\"postgres\"", "db.username" => "\"postgres\"", "db.password" => "\"somepassword\"", "db.host" => "\"localhost\"" })  
-          mailto "sample@example.com"  
-          action :backup  
-        end
+backup_model "pg" do  
+  description "backup of postgres"  
+  backup_type "database"  
+  database_type "PostgreSQL"  
+  split_into_chunks_of 2048  
+  store_with({
+    "engine" => "S3",
+    "settings" => { 
+      "s3.access_key_id" => "sample",
+      "s3.secret_access_key" => "sample",
+      "s3.region" => "us-east-1",
+      "s3.bucket" => "sample",
+      "s3.path" => "/",
+      "s3.keep" => 10
+    }
+  })
+  options({
+    "db.name" => "\"postgres\"",
+    "db.username" => "\"postgres\"",
+    "db.password" => "\"somepassword\"",
+    "db.host" => "\"localhost\""
+    })  
+  mailto "sample@example.com"  
+  action :create  
+end
+```
 
 * Backing up Files to S3
   1. Ensure the cookbook are updating depends on the backup cookbook.
   2. Add the following to that cookbook
 
-        include_recipe "backup"
-  
-        backup_generate_config node.name
 
-        backup_generate_model "home" do  
-          description "backup of /home"  
-          backup_type "archive"  
-          split_into_chunks_of 250  
-          store_with({"engine" => "S3", "settings" => { "s3.access_key_id" => "sample", "s3.secret_access_key" => "sample", "s3.region" => "us-east-1", "s3.bucket" => "sample", "s3.path" => "/", "s3.keep" => 10 } } )  
-          options({"add" => ["/home/","/root/"], "exclude" => ["/home/tmp"], "tar_options" => "-p"})  
-          mailto "sample@example.com"  
-          action :backup  
-        end  
+
+include_recipe "backup"
+  
+backup_model "home" do  
+  description "backup of /home"  
+  backup_type "archive"  
+  split_into_chunks_of 250  
+  store_with({
+    "engine" => "S3",
+    "settings" => {
+      "s3.access_key_id" => "sample", 
+      "s3.secret_access_key" => "sample", 
+      "s3.region" => "us-east-1", 
+      "s3.bucket" => "sample", 
+      "s3.path" => "/", 
+      "s3.keep" => 10 
+    }
+  })  
+  options({
+    "add" => ["/home/","/root/"],
+    "exclude" => ["/home/tmp"],
+    "tar_options" => "-p"
+  })  
+  mailto "sample@example.com"  
+  action :create  
+end
+```
 
 * There is no technical reason you cannot load more of this code in via an `role` or an `data bag` instead.
 
