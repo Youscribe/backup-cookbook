@@ -26,10 +26,8 @@ Actions:
 Attribute Parameters:
 
 * `split_into_chunks_of` - Fixnum - defaults to 250  
-* `description` - String - Description of backup   
-* `backup_type` - String - Type of backup to perform.  Current options supported are `{database|archive}`  
-* `store_with` - Hash - Specifies how to store the backups  
-* `database_type` - String - If backing up a database, what [Type](https://github.com/meskyanichi/backup/wiki/Databases) of database is being backed up.    
+* `description` - String - Description of backup
+* `definition` - String - Definition of the backup in backup language
 * `hour` - String - Hour to run the scheduled backup - default - `1`  
 * `minute` - String - Minute to run the scheduled backup - default - `*`  
 * `day` - String - Day to run the scheduled backup - default - `*`  
@@ -43,105 +41,35 @@ Usage
 
 There is an ininite ways you can implement this cookbook into your environment in theory.  An working example might be,
 
-* Backing up MongoDB to S3
-  1. Ensure your mongodb cookbook depends on the backup cookbook
-  2. Add the following to your mongodb cookbook
+* Backing up MySQL to S3
 
 ```
 include_recipe "backup"
 
-backup_model "mongodb" do  
-  description "Our shard"  
-  backup_type "database"  
-  database_type "MongoDB"  
-  split_into_chunks_of 2048  
-  store_with({
-    "engine" => "S3",
-    "settings" => {
-       "s3.access_key_id" => "example",
-       "s3.secret_access_key" => "sample",
-       "s3.region" => "us-east-1",
-       "s3.bucket" => "sample",
-       "s3.path" => "/",
-       "s3.keep" => 10 
-    }
-  })  
-  options({
-    "db.host" => "\"localhost\"",
-    "db.lock" => true
-  })  
-  mailto "some@example.com"  
-  action :create  
-end  
-```   
+backup_model :my_db do
+  description "Back up my database"
 
-* Backing up PostgreSQL to S3
-  1. Ensure your postgresql cookbook depends on the backup cookbook
-  2. Add the following to your postgresql cookbook
+  definition <<-EOH
+    split_into_chunks_of 4000
 
-```
-include_recipe "backup"
-  
-backup_model "pg" do  
-  description "backup of postgres"  
-  backup_type "database"  
-  database_type "PostgreSQL"  
-  split_into_chunks_of 2048  
-  store_with({
-    "engine" => "S3",
-    "settings" => { 
-      "s3.access_key_id" => "sample",
-      "s3.secret_access_key" => "sample",
-      "s3.region" => "us-east-1",
-      "s3.bucket" => "sample",
-      "s3.path" => "/",
-      "s3.keep" => 10
-    }
-  })
-  options({
-    "db.name" => "\"postgres\"",
-    "db.username" => "\"postgres\"",
-    "db.password" => "\"somepassword\"",
-    "db.host" => "\"localhost\""
-    })  
+    database MySQL do |db|
+      db.name = 'mydb'
+      db.username = 'myuser'
+      db.password = '#{node['mydb']['password']}' # will be interpolated
+    end
+
+    compress_with Gzip
+
+    store_with S3 do |s3|
+      s3.access_key_id = '#{node['aws']['access_key_id']}'
+      s3.secret_access_key = '#{node['aws']['secret_access_key']}'
+      s3.bucket = 'mybucket'
+    end
+  EOH
   mailto "sample@example.com"  
   action :create  
 end
 ```
-
-* Backing up Files to S3
-  1. Ensure the cookbook are updating depends on the backup cookbook.
-  2. Add the following to that cookbook
-
-```
-include_recipe "backup"
-  
-backup_model "home" do  
-  description "backup of /home"  
-  backup_type "archive"  
-  split_into_chunks_of 250  
-  store_with({
-    "engine" => "S3",
-    "settings" => {
-      "s3.access_key_id" => "sample", 
-      "s3.secret_access_key" => "sample", 
-      "s3.region" => "us-east-1", 
-      "s3.bucket" => "sample", 
-      "s3.path" => "/", 
-      "s3.keep" => 10 
-    }
-  })  
-  options({
-    "add" => ["/home/","/root/"],
-    "exclude" => ["/home/tmp"],
-    "tar_options" => "-p"
-  })  
-  mailto "sample@example.com"  
-  action :create  
-end
-```
-
-* There is no technical reason you cannot load more of this code in via an `role` or an `data bag` instead.
 
 License and Author
 ==================

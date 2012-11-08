@@ -1,5 +1,4 @@
 action :create do
-  include_recipe "cron"
   cron_d new_resource.name do
     hour new_resource.hour || "1" 
     minute new_resource.minute || "*"
@@ -17,17 +16,12 @@ action :create do
   template "Model File" do
     path ::File.join( node['backup']['conf_dir'], new_resource.name + '.rb')
     mode 0600
-    source new_resource.options["source"] || "generic_model.conf.erb"
-    cookbook new_resource.options["cookbook"] || "backup"
+    source "generic_model.conf.erb"
+    cookbook "backup"
     variables(
       :name => new_resource.name, 
-      :options => new_resource.options,
-      :split_into_chunks_of => new_resource.split_into_chunks_of,
       :description => new_resource.description,
-      :backup_type => new_resource.backup_type,
-      :database_type => new_resource.database_type,
-      :store_with => new_resource.store_with,
-      :password => new_resource.password
+      :definition => new_resource.definition
     )
     notifies :create, resources(:cron_d => new_resource.name), :immediately
   end
