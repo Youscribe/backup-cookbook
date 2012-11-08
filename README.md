@@ -114,8 +114,7 @@ end
   1. Ensure the cookbook are updating depends on the backup cookbook.
   2. Add the following to that cookbook
 
-
-
+```
 include_recipe "backup"
   
 backup_model "home" do  
