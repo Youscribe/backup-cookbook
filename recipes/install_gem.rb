@@ -8,8 +8,12 @@ package "libxml-dev" do
   action :install
 end
 
+gem_package "backup" do
+    version '~> 3.0'
+    action :install
+end
 
-['backup', 's3sync', 'fog', 'mail', 'whenever', 'popen4'].each do |gem_name|
+['s3sync', 'fog', 'mail', 'whenever', 'popen4'].each do |gem_name|
   gem_package gem_name do
     action :install
   end
